@@ -4,8 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Loader } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
+import { api } from "@/lib/axios";
 
 // Função para extrair o payload do token
 function getPayloadFromToken(token: string) {
@@ -30,7 +30,7 @@ export function Sign_in() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3000/login_users", {
+      const response = await api.post("/login_users", {
         email_user: email,
         password_user: password,
       });

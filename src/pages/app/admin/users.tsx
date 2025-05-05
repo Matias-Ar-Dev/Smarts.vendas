@@ -1,23 +1,21 @@
-import { useEffect, useState } from "react";
-import { Mobile } from "./menumobile";
-import {
-  CardTitle,
-} from "@/components/ui/card";
-
+import { useState } from "react"
+import { Mobile } from "./menumobile"
+import { CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogTrigger
-} from "@/components/ui/dialog";
-
-import { EddUser } from "@/components/edduser_list_doc/edd_users";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/dialog"
+import { EddUser } from "@/components/edduser_list_doc/edd_users"
+import { Button } from "@/components/ui/button"
 import {
-  Delete,
+  ChevronLeft,
+  ChevronRight,
   Edit,
   LoaderCircleIcon,
   Plus,
+  Trash2,
   UserCheck
-} from "lucide-react";
+} from "lucide-react"
 import {
   Table,
   TableBody,
@@ -25,28 +23,18 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from "@/components/ui/table";
-import { useFetch } from "@/api/useFetch";
-import { Skeleton } from "@/components/ui/skeleton";
-
-
-
-// Tipagem dos usuários
-type Usuario = {
-  id_user: number;
-  name_user: string;
-  email_user: string;
-  role_user: string;
-  
-  
-}
+} from "@/components/ui/table"
+import { useUsers } from "@/hooks/userts"
+import { useDeleteUser } from "@/hooks/userDelete" // ✅ importando o hook personalizado
 
 export function Dashboard_Admin_Users() {
+  const [page, setPage] = useState(1)
+  const { data, isLoading, isError } = useUsers(page)
 
-  const {users, isFetching} = useFetch<Usuario> (`/list_users`)
+  const deleteUser = useDeleteUser(page) // ✅ usando o hook com paginação
 
-  // Chamada da API no carregamento
-  
+  const users = data?.data ?? []
+  const totalPages = data?.lastPage ?? 1
 
   return (
     <>
@@ -73,49 +61,65 @@ export function Dashboard_Admin_Users() {
               <EddUser />
             </Dialog>
           </div>
-
-         
         </section>
-        {isFetching && <p className="flex items-center justify-center"> carregar....
-            <LoaderCircleIcon className="animate-spin text-orange-600 w-11 h-11"/>
-          </p> }
-          {/* <div className="pt-9">
-                                  <Skeleton className=" h-4 w-40"/> <br />
-                                  <div className="flex gap-2 flex-col">
-                                  <Skeleton className=" h-4 w-4"/>
-                                  <Skeleton className=" h-10 w-32"/><br />
-                                  <Skeleton className=" h-4 w-40"/> 
-                                  </div> 
-              </div> */}
 
-        <Table className="text-nowrap border rounded-md">
-          <TableHeader className="bg-orange-200">
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Editar/Excluir</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users?.map((usuario) => (
-              <TableRow key={usuario.id_user} className="bg-gray-100">
-                <TableCell className="capitalize">{usuario.name_user}</TableCell>
-                <TableCell>{usuario.email_user}</TableCell>
-                <TableCell>{usuario.role_user}</TableCell>
-                <TableCell>
-                  <Button className="bg-orange-400 hover:bg-orange-600 mr-2">
-                    <Edit />
-                  </Button>
-                  <Button className=" bg-orange-400 hover:bg-orange-600">
-                    <Delete />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {isLoading && (
+          <p className="flex items-center justify-center">
+            carregar...
+            <LoaderCircleIcon className="animate-spin text-orange-600 w-11 h-11" />
+          </p>
+        )}
+
+        {isError && (
+          <p className="text-red-500">Erro ao carregar dados.</p>
+        )}
+
+        {!isLoading && !isError && (
+          <>
+            <Table className="text-nowrap border rounded-md">
+              <TableHeader className="bg-orange-200">
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Editar/Excluir</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id_user} className="bg-gray-100">
+                    <TableCell className="capitalize">{user.name_user}</TableCell>
+                    <TableCell>{user.email_user}</TableCell>
+                    <TableCell>{user.role_user}</TableCell>
+                    <TableCell>
+                      <Button className="bg-orange-400 hover:bg-orange-500 mr-2">
+                        <Edit />
+                      </Button>
+                      <Button
+                        className="bg-orange-400 hover:bg-orange-500"
+                        onClick={() => deleteUser.mutate(user.id_user)} // ✅ usando o hook
+                      >
+                        <Trash2 className="text-red-500 font-bold" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Paginação */}
+            <div className="flex justify-end gap-2 mt-4">
+              <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+                <ChevronLeft/>
+              </Button>
+              <span className="text-sm text-gray-600 self-center">Página {page}</span>
+              <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>
+                <ChevronRight/>
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </>
-  );
+  )
 }
