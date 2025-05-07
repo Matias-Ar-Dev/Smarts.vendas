@@ -77,9 +77,9 @@ export function Header_Admin (){
     <Tooltip>
         <TooltipTrigger asChild>
     
-        <Link to='/clies'    className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/clies') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
+        <Link to='/doc_admin'    className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/doc_admin') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
     
-    <Archive  className= {`h-5 w-5 transition-all  ${isActive('/clies') ? ` text-black`:''}    `} />
+    <Archive  className= {`h-5 w-5 transition-all  ${isActive('/doc_admin') ? ` text-black`:''}    `} />
     <span className="sr-only">Arquivos</span>
     </Link>
         </TooltipTrigger>
@@ -179,11 +179,11 @@ export function Header_Admin (){
                      <span className={` ${isActive('/notfi') ? ` text-black`:''} `}>  notificações</span>
                    </Link>
                     <Link
-                      to="/clies"
+                      to="/doc_admin"
                       className=" flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground  "
                     >
-                      <Archive className= {`h-5 w-5 transition-all ${isActive('/notfi') ? ` text-black`:''}`} />
-                      <span  className={` ${isActive('/clies') ? ` text-black`:''} `}>
+                      <Archive className= {`h-5 w-5 transition-all ${isActive('/doc_admin') ? ` text-black`:''}`} />
+                      <span  className={` ${isActive('/doc_admin') ? ` text-black`:''} `}>
                       Arquivos
                       </span>
                     </Link>

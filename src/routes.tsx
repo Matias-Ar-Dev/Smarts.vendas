@@ -9,6 +9,11 @@ import { AppLayoutUsers } from './pages/_layouts/app-users';
 import { Dashboard_user } from './pages/app/users/dashboard-user';
 import { PrivateRoute } from './privateRoute';
 
+import UploadForm from './pages/app/admin/adminDoc';
+import EditUploadForm from './pages/app/admin/add';
+import { Dashboard_admin_doc } from './pages/app/admin/doc_admin';
+
+
  // Importa aqui
 
 export const router = createBrowserRouter([
@@ -32,7 +37,10 @@ export const router = createBrowserRouter([
         element: <AppLayoutAdmin />,
         children: [
           { path: '/', element: <Dashboard_Admin /> },
-          { path: '/users_admin', element: <Dashboard_Admin_Users /> }
+          { path: '/users_admin', element: <Dashboard_Admin_Users /> },
+          {path:'/edit_doc', element:<UploadForm/>},
+          {path:'/e', element:<EditUploadForm/>},
+          {path:'/doc_admin', element:<Dashboard_admin_doc/>}
         ]
       },
 
