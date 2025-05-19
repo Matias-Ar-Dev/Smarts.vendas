@@ -10,8 +10,10 @@ import { Dashboard_user } from './pages/app/users/dashboard-user';
 import { PrivateRoute } from './privateRoute';
 
 import UploadForm from './pages/app/admin/adminDoc';
-import EditUploadForm from './pages/app/admin/add';
+
 import { Dashboard_admin_doc } from './pages/app/admin/doc_admin';
+import { Form } from './pages/app/admin/te';
+import { NotFound } from './pages/404';
 
 
  // Importa aqui
@@ -22,6 +24,7 @@ export const router = createBrowserRouter([
   {
     path: '/sign-in',
     element: <AuthLayoutUser />,
+    errorElement:<NotFound/>,
     children: [
       { path: '/sign-in', element: <Sign_in /> }
     ]
@@ -35,11 +38,12 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <AppLayoutAdmin />,
+        errorElement:<NotFound/>,
         children: [
           { path: '/', element: <Dashboard_Admin /> },
           { path: '/users_admin', element: <Dashboard_Admin_Users /> },
           {path:'/edit_doc', element:<UploadForm/>},
-          {path:'/e', element:<EditUploadForm/>},
+          {path:'/e', element:<Form/>},
           {path:'/doc_admin', element:<Dashboard_admin_doc/>}
         ]
       },
@@ -47,6 +51,7 @@ export const router = createBrowserRouter([
       {
         path: '/users_func',
         element: <AppLayoutUsers />,
+        errorElement:<NotFound/>,
         children: [
           { path: '/users_func', element: <Dashboard_user /> }
         ]

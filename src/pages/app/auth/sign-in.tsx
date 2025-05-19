@@ -42,6 +42,8 @@ export function Sign_in() {
 
         const payload = getPayloadFromToken(token);
         const role = payload?.role_user;
+        const name = payload?.name_user;
+        const email = payload?.email_user;
 
         if (!role) {
           toast.error("Perfil de usuário desconhecido.");
@@ -49,6 +51,8 @@ export function Sign_in() {
         }
 
         localStorage.setItem("role", role);
+        localStorage.setItem("name", name); 
+        localStorage.setItem("email", email);  
         toast.success("Login realizado com sucesso!");
 
         setTimeout(() => {

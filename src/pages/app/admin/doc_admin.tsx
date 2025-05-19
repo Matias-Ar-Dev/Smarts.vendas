@@ -18,6 +18,7 @@ import { useDeleteUpload } from "@/hooks/useDeleteUpload";
 
 import { Toaster } from "sonner";
 import { useUpdateUpload } from "@/hooks/updadeUpload";
+import { Helmet } from "react-helmet-async";
 
 export function Dashboard_admin_doc() {
   const [page, setPage] = useState(1);
@@ -57,10 +58,11 @@ export function Dashboard_admin_doc() {
     <>
       <Mobile />
       <section className="sm:ml-14 p-4">
+        
         <Toaster richColors position="top-right" /> {/* Sonner ativado */}
         <section className="flex items-start justify-between flex-col lg:flex-row">
           <div className="p-4">
-            <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
+            <CardTitle className="text-lg sm:text-xl  text-gray-800 select-none">
               Painel do admin
             </CardTitle>
             <span className="text-zinc-500">

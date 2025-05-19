@@ -2,6 +2,7 @@ import { CircleArrowRight, DownloadCloud } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { useUploads } from "@/hooks/uploads"
 import { useState } from "react"
+import { Skeleton } from "../ui/skeleton"
 
 function Doc() {
   const [page, setPage] = useState(1)
@@ -22,6 +23,23 @@ function Doc() {
       setPage(prevPage => prevPage - 1)
     }
   }
+  if(isLoading) return  <Card className='flex-1 p-6' >
+    
+   <div><p>carregar...</p>
+  
+  <div className="pt-9">
+                                  <Skeleton className=" h-4 w-40 mb-3"/> 
+                                  <div className="flex gap-4 flex-col">
+                                  <Skeleton className=" h-12 w-full"/>
+                                  <Skeleton className=" h-10 w-32"/><br />
+                                  <Skeleton className=" h-10 w-1/2"/> 
+                                  </div> 
+              </div>
+  </div>
+  </Card>
+  if(isError) return <Card className="flex-1 p-6">
+    <p className="text-red-600">Erro ao Carregar documentos...</p>
+  </Card>
 
   return (
     <Card className="w-full md:w-1/2 max-w-600px">
@@ -39,8 +57,8 @@ function Doc() {
       </CardHeader>
 
       <CardContent>
-        {isLoading && <p className="text-sm text-gray-500">Carregando...</p>}
-        {isError && <p className="text-sm text-red-500">Erro ao carregar os documentos.</p>}
+        
+        
 
         {data?.data.length === 0 && !isLoading && !isError && (
           <p className="text-sm text-gray-400">Nenhum documento encontrado.</p>

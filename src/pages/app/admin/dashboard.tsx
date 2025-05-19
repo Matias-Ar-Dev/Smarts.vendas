@@ -16,14 +16,11 @@ import Doc from "@/components/edduser_list_doc/doclist";
 import Users from "@/components/edduser_list_doc/users";
 import { useUserCount } from "@/hooks/total_user";
 
-export function Dashboard_Admin() {
-  const [userName, setUserName] = useState("");
-  const{data} = useUserCount()
 
-  useEffect(() => {
-    const name = localStorage.getItem("user_name");
-    if (name) setUserName(name);
-  }, []);
+
+export function Dashboard_Admin() {
+  const{data} = useUserCount()
+  
 
 
   return (
@@ -34,12 +31,11 @@ export function Dashboard_Admin() {
         <section className="flex items-start justify-between flex-col lg:flex-row">
           <div className="p-4">
             <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-              Painel do admin{" "}
-              {userName && <span className="text-orange-500">({userName})</span>}
+              Painel do admin
             </CardTitle>
-            <span className="text-zinc-500">
-              Gestão e controle de todas as actividades na plataforma
-            </span>
+
+            
+            
           </div>
           <div className="flex items-center justify-between gap-4 p-4">
             <Dialog>

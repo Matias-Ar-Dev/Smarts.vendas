@@ -4,6 +4,7 @@ import { Button } from '../ui/button'
 import { useState } from 'react'
 import { useUsers } from '@/hooks/userts'
 import { useDeleteUser } from '@/hooks/userDelete'
+import { Skeleton } from '../ui/skeleton'
 
 function Users () {
   const [page, setPage] = useState(1)
@@ -15,8 +16,26 @@ function Users () {
   const totalPages = data?.lastPage ?? 1
 
   // Verificando se os dados foram carregados com sucesso
-  if (isLoading) return <p>Carregando...</p>
-  if (isError) return <p>Erro ao carregar...</p>
+  if (isLoading) return <Card className='flex-1 p-6' >
+    
+   <div><p>carregar...</p>
+  
+  <div className="pt-9">
+                                  <Skeleton className=" h-4 w-40 mb-3"/> 
+                                  <div className="flex gap-4 flex-col">
+                                  <Skeleton className=" h-12 w-full"/>
+                                  <Skeleton className=" h-10 w-32"/><br />
+                                  <Skeleton className=" h-10 w-1/2"/> 
+                                  </div> 
+              </div>
+  </div>
+  </Card>
+  if (isError) return <Card className='flex-1 p-6'>
+      <p className='text-red-600'>Erro ao Carregar Usuários...</p>
+
+  </Card>
+  
+
 
   return (
     <Card className='flex-1'>
