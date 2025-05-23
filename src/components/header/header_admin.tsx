@@ -12,6 +12,7 @@ import {
   PanelBottom,
   Settings2,
   ShoppingBag,
+  User,
   User2,
   UserCheck,
   UserCog,
@@ -116,9 +117,10 @@ export function Header_Admin (){
     <Tooltip>
         <TooltipTrigger asChild>
     
-        <Link to='/' className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-full  bg-orange-500 text-muted-foreground transition-colors hover:text-white " >
+
+        <Link to='/profile-user' className={` flex h-9 w-9 shrink-0 items-center justify-center rounded-full   text-muted-foreground transition-colors hover:text-white ${isActive('/profile-user') ?'bg-orange-300 border-orange-500 border-t-[4px]':'bg-orange-500'}`}  >
     
-    <UserCog className="w-5 h-5 "/>
+    <User  className= {`h-5 w-5 transition-all  ${isActive('/profile-user') ? ` text-black`:''}    `}/>
     <span className="sr-only">Editar</span>
     </Link>
         </TooltipTrigger>

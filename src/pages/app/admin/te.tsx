@@ -1,84 +1,82 @@
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { api } from "@/lib/axios";
+import { useEditProfile } from '@/hooks/ed';
+import React, { useState } from 'react';
 
 
-export function Form() {
-  const [formData, setFormData] = useState({
-    name_user: "",
-    email_user: "",
-    password_user: "",
-    role_user: "",
+export const EditProfile = () => {
+  const [form, setForm] = useState({
+    name_user: '',
+    email_user: '',
+    password_user: '',
   });
 
-  const token = localStorage.getItem("token");
-  const user = token ? getPayloadFromToken(token) : null;
-  const id_user = user?.id_user;
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name_user: user.name_user,
-        email_user: user.email_user,
-        password_user: "",
-        role_user: user.role_user,
-      });
-    }
-  }, [user]);
+  const mutation = useEditProfile();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      await api.put(`/edit_user/${id_user}`, formData, {
-        headers: {
-          Authorization: `${token}`,
-        },
-      });
-      toast.success("Usuário atualizado com sucesso!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao atualizar usuário.");
-    }
+    const { name_user, email_user, password_user } = form;
+
+    mutation.mutate({
+      name_user,
+      email_user,
+      password_user: password_user.trim() === '' ? undefined : password_user,
+    });
   };
 
-  if (!user) return <p>Carregando dados do usuário...</p>;
-
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col gap-4">
-      <Input
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 bg-white rounded-xl shadow">
+      <h2 className="text-xl font-bold mb-4">Editar Perfil</h2>
+
+      <input
+        type="text"
         name="name_user"
-        value={formData.name_user}
-        onChange={handleChange}
         placeholder="Nome"
-      />
-      <Input
-        name="email_user"
-        value={formData.email_user}
+        value={form.name_user}
         onChange={handleChange}
-        placeholder="Email"
+        className="block w-full mb-3 border p-2 rounded"
+        required
+      />
+
+      <input
         type="email"
-      />
-      <Input
-        name="password_user"
-        value={formData.password_user}
+        name="email_user"
+        placeholder="Email"
+        value={form.email_user}
         onChange={handleChange}
-        placeholder="Nova Senha (opcional)"
-        type="password"
+        className="block w-full mb-3 border p-2 rounded"
+        required
       />
-      <Button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white">
-        Atualizar Dados
-      </Button>
+
+      <input
+        type="password"
+        name="password_user"
+        placeholder="Nova senha (opcional)"
+        value={form.password_user}
+        onChange={handleChange}
+        className="block w-full mb-3 border p-2 rounded"
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        disabled={mutation.isPending}
+      >
+        {mutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
+      </button>
+
+      {mutation.isSuccess && (
+        <p className="text-green-600 mt-2">Perfil atualizado com sucesso!</p>
+      )}
+      {mutation.isError && (
+        <p className="text-red-600 mt-2">
+          Erro: {(mutation.error as any).response?.data?.message || 'Erro ao atualizar'}
+        </p>
+      )}
     </form>
   );
-}
-function getPayloadFromToken(token: string) {
-    throw new Error("Function not implemented.");
-}
-
+};
