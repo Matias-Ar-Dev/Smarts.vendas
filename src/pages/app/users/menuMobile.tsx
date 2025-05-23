@@ -1,8 +1,5 @@
-import Logo from "../../../assets/teste.png"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { AlertCircle, BadgeDollarSign, Bell, DollarSign, FileText, Inbox, LogIn, Percent, Plus, Search, User2Icon, UserCheck, UserPlus, Users } from "lucide-react"
+import {  Bell } from "lucide-react"
 import { useEffect, useState } from "react"
 
 

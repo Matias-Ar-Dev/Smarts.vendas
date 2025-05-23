@@ -3,7 +3,7 @@ import { DialogContent, DialogHeader } from "../ui/dialog";
 import { useUpload } from "@/hooks/useUploas";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Flashlight, Paperclip } from "lucide-react";
+import { Paperclip } from "lucide-react";
 
 
 const CreateUploadForm: React.FC = () => {

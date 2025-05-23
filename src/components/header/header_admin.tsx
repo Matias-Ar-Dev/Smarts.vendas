@@ -5,23 +5,14 @@ import {
   Archive,
   Bell,
   HomeIcon,
-  LogOut,
   LucideLogIn,
-  MessageSquare,
   Package,
   PanelBottom,
-  Settings2,
-  ShoppingBag,
   User,
-  User2,
-  UserCheck,
-  UserCog,
-  Users,
-  Users2,
+  User2
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogTrigger } from "../ui/dialog";
-import { EddUser } from "../edduser_list_doc/edd_users";
 import { Terminar_se } from "../edduser_list_doc/terminar_s";
 export function Header_Admin (){
   const location = useLocation();

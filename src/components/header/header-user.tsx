@@ -5,18 +5,10 @@ import {
     Archive,
   Bell,
   HomeIcon,
-  LogOut,
   LucideLogIn,
-  MessageSquare,
   Package,
   PanelBottom,
-  Settings2,
-  ShoppingBag,
-  User2,
-  UserCheck,
-  UserCog,
-  Users,
-  Users2,
+  UserCog
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogTrigger } from "../ui/dialog";

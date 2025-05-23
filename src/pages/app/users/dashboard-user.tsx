@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Mobile_user } from "./menuMobile";
-import { Archive, Dock, DockIcon, Plus, UserCheck } from "lucide-react";
+import { Archive, Dock, DockIcon} from "lucide-react";
 import Doc from "@/components/edduser_list_doc/doclist";
 export function Dashboard_user (){
     return (

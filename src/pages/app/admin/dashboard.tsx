@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import Logo from "../../../assets/teste.png";
 import {
   Card,
   CardContent,
