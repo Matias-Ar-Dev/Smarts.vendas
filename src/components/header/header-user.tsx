@@ -13,6 +13,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import Logo from '../../assets/logo_smarts.jpg'
+import { Terminar_se_user } from "../edduser_list_doc/terminar-user";
 export function Header_users(){
      const location = useLocation();
     
@@ -68,7 +69,7 @@ export function Header_users(){
             <Tooltip>
                 <TooltipTrigger asChild>
             
-                <Link to='/clies'    className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/clies') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
+                <Link to='/doc_admin'  className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/clies') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
             
             <Archive  className= {`h-5 w-5 transition-all  ${isActive('/clies') ? ` text-black`:''}    `} />
             <span className="sr-only">Arquivos</span>
@@ -93,11 +94,12 @@ export function Header_users(){
             <Tooltip>
                 <TooltipTrigger asChild>
             
-                <Link to='/users_func' className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-full  bg-orange-500 text-muted-foreground transition-colors hover:text-white " >
+                <Link to='/profile-user' className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-full  bg-orange-500 text-muted-foreground transition-colors hover:text-white " >
             
             <UserCog className="w-5 h-5 "/>
             <span className="sr-only">Editar</span>
             </Link>
+
                 </TooltipTrigger>
                 <TooltipContent side="right">
                     
@@ -113,6 +115,7 @@ export function Header_users(){
                     </div>
         
                 </DialogTrigger>
+                <Terminar_se_user/>
                 
             </Dialog>
             </nav>

@@ -11,30 +11,52 @@ import {
   Trash2
 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUsers } from '@/hooks/userts';
 import { useDeleteUser } from '@/hooks/userDelete';
 import { Skeleton } from '../ui/skeleton';
 import { Input } from '../ui/input';
+import axios from 'axios';
 
 function Users () {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [filterError, setFilterError] = useState(false);
+
   const { data, isLoading, isError } = useUsers(page);
   const deleteUser = useDeleteUser();
 
-  // Dados da API
   const users = data?.data ?? [];
   const totalPages = data?.lastPage ?? 1;
 
-  // Filtro local por nome ou email
-  const filteredUsers = users.filter(user =>
-    user.name_user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email_user.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchFilteredUsers = async () => {
+      if (searchTerm.trim() === '') {
+        setFilteredUsers([]);
+        setIsFiltering(false);
+        return;
+      }
 
-  // Carregando
-  if (isLoading) {
+      try {
+        setIsFiltering(true);
+        setFilterError(false);
+        const res = await axios.get(`http://localhost:3000/filter_users?search=${encodeURIComponent(searchTerm)}`);
+        setFilteredUsers(res.data);
+      } catch (error) {
+        setFilterError(true);
+      } finally {
+        setIsFiltering(false);
+      }
+    };
+
+    fetchFilteredUsers();
+  }, [searchTerm]);
+
+  const currentUsers = searchTerm ? filteredUsers : users;
+
+  if (isLoading && !searchTerm) {
     return (
       <Card className='flex-1 p-6'>
         <div>
@@ -52,8 +74,7 @@ function Users () {
     );
   }
 
-  // Erro ao carregar
-  if (isError) {
+  if ((isError || filterError) && !isFiltering) {
     return (
       <Card className='flex-1 p-6'>
         <p className='text-red-600'>Erro ao Carregar Usuários...</p>
@@ -74,10 +95,12 @@ function Users () {
       </CardHeader>
 
       <CardContent>
-        {filteredUsers.length === 0 ? (
+        {isFiltering ? (
+          <p className="text-gray-500">Filtrando usuários...</p>
+        ) : currentUsers.length === 0 ? (
           <p className="text-sm text-gray-500 mt-4">Nenhum usuário encontrado.</p>
         ) : (
-          filteredUsers.map(user => (
+          currentUsers.map(user => (
             <article
               key={user.id_user}
               className='flex items-center gap-2 border-b py-2 justify-between'
@@ -97,24 +120,25 @@ function Users () {
           ))
         )}
 
-        {/* Paginação */}
-        <div className='flex justify-end gap-2 mt-4'>
-          <Button
-            className="bg-orange-400 hover:bg-orange-500"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            <ChevronLeft />
-          </Button>
-          <span className='text-sm text-gray-600 self-center'>Página {page}</span>
-          <Button
-            className="bg-orange-400 hover:bg-orange-500"
-            onClick={() => setPage(p => p + 1)}
-            disabled={page >= totalPages}
-          >
-            <ChevronRight />
-          </Button>
-        </div>
+        {!searchTerm && (
+          <div className='flex justify-end gap-2 mt-4'>
+            <Button
+              className="bg-orange-400 hover:bg-orange-500"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft />
+            </Button>
+            <span className='text-sm text-gray-600 self-center'>Página {page}</span>
+            <Button
+              className="bg-orange-400 hover:bg-orange-500"
+              onClick={() => setPage(p => p + 1)}
+              disabled={page >= totalPages}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

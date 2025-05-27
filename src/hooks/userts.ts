@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/axios'
 
 export type Usuario = {
@@ -23,5 +23,6 @@ export function useUsers(page: number) {
       const response = await api.get(`/list_users?page=${page}&limit=6`)
       return response.data
     },
+    placeholderData:keepPreviousData,
   })
 }

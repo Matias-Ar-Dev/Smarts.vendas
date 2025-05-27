@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/axios'
 
 export type doc = {
@@ -32,6 +32,7 @@ export function useUploads({ page = 1, limit = 6 }: UseUploadsProps) {
       })
       return response.data // Retorna a estrutura paginada
     },
-    // Remover o keepPreviousData: true aqui
+    placeholderData: keepPreviousData,
+    
   })
 }

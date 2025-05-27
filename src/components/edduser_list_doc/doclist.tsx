@@ -82,7 +82,7 @@ function Doc() {
               <div className="flex items-center flex-col justify-center gap-3 mr-9 sm:flex-row">
                 <p className="text-sm sm:text-base font-semibold">transferir</p>
                 <a
-                  href={`http://localhost:3000/download/${doc.id_uploads}`} // ajuste conforme backend
+                  href={`http://localhost:3000/download/${doc.id_uploads}`} // link do dowload do arquivo
                   download
                   className="text-[12px] sm:text-sm text-gray-400 cursor-pointer"
                 >

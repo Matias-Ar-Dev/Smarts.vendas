@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import axios from "axios"
 import { Mobile } from "./menumobile"
 import { CardTitle } from "@/components/ui/card"
 import {
@@ -25,16 +26,39 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { useUsers } from "@/hooks/userts"
-import { useDeleteUser } from "@/hooks/userDelete" // ✅ importando o hook personalizado
+import { useDeleteUser } from "@/hooks/userDelete"
+import { Input } from "@/components/ui/input"
+import { api } from "@/lib/axios"
 
 export function Dashboard_Admin_Users() {
   const [page, setPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredUsers, setFilteredUsers] = useState([])
   const { data, isLoading, isError } = useUsers(page)
-
-  const deleteUser = useDeleteUser(page) // ✅ usando o hook com paginação
+  const deleteUser = useDeleteUser(page)
 
   const users = data?.data ?? []
   const totalPages = data?.lastPage ?? 1
+
+  const isSearching = searchTerm.trim() !== ''
+
+  useEffect(() => {
+    const fetchFilteredUsers = async () => {
+      if (!isSearching) {
+        setFilteredUsers([])
+        return
+      }
+
+      try {
+        const res = await api.get(`/filter_users?search=${encodeURIComponent(searchTerm)}`)
+        setFilteredUsers(res.data)
+      } catch (err) {
+        console.error('Erro ao buscar usuários filtrados:', err)
+      }
+    }
+
+    fetchFilteredUsers()
+  }, [searchTerm])
 
   return (
     <>
@@ -63,6 +87,15 @@ export function Dashboard_Admin_Users() {
           </div>
         </section>
 
+        {/* Campo de busca */}
+        <Input
+          placeholder="Pesquisar por nome ou email"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="mb-4 max-w-sm"
+        />
+
+        {/* Carregando */}
         {isLoading && (
           <p className="flex items-center justify-center">
             carregar...
@@ -70,12 +103,14 @@ export function Dashboard_Admin_Users() {
           </p>
         )}
 
+        {/* Erro */}
         {isError && (
           <p className="text-red-500">Erro ao carregar dados.</p>
         )}
 
         {!isLoading && !isError && (
           <>
+            {/* Tabela */}
             <Table className="text-nowrap border rounded-md">
               <TableHeader className="bg-orange-200">
                 <TableRow>
@@ -86,7 +121,7 @@ export function Dashboard_Admin_Users() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
+                {(isSearching ? filteredUsers : users).map((user) => (
                   <TableRow key={user.id_user} className="bg-gray-100">
                     <TableCell className="capitalize">{user.name_user}</TableCell>
                     <TableCell>{user.email_user}</TableCell>
@@ -97,7 +132,7 @@ export function Dashboard_Admin_Users() {
                       </Button>
                       <Button
                         className="bg-orange-400 hover:bg-orange-500"
-                        onClick={() => deleteUser.mutate(user.id_user)} // ✅ usando o hook
+                        onClick={() => deleteUser.mutate(user.id_user)}
                       >
                         <Trash2 className="text-red-500 font-bold" />
                       </Button>
@@ -108,15 +143,17 @@ export function Dashboard_Admin_Users() {
             </Table>
 
             {/* Paginação */}
-            <div className="flex justify-end gap-2 mt-4">
-              <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
-                <ChevronLeft/>
-              </Button>
-              <span className="text-sm text-gray-600 self-center">Página {page}</span>
-              <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>
-                <ChevronRight/>
-              </Button>
-            </div>
+            {!isSearching && (
+              <div className="flex justify-end gap-2 mt-4">
+                <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+                  <ChevronLeft />
+                </Button>
+                <span className="text-sm text-gray-600 self-center">Página {page}</span>
+                <Button className="bg-orange-400 hover:bg-orange-500" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>
+                  <ChevronRight />
+                </Button>
+              </div>
+            )}
           </>
         )}
       </div>
