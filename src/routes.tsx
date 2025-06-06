@@ -21,6 +21,8 @@ import { PrivateRoute } from './privateRoute';
 // Página de erro
 import { NotFound } from './pages/404';
 import { EditProfile } from './pages/app/Profile_User/profile_user';
+import Document_List_User from './pages/app/users/document_user/document_user';
+
 
 
 
@@ -58,6 +60,7 @@ export const router = createBrowserRouter([
         element: <AppLayoutUsers />,
         children: [
           { path: '/users_func', element: <Dashboard_user /> },
+          {path:'/users_func/doc_user', element: <Document_List_User/>},
         ],
       },
     ],

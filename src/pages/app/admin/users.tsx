@@ -117,7 +117,7 @@ export function Dashboard_Admin_Users() {
                   <TableHead>Nome</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Categoria</TableHead>
-                  <TableHead>Editar/Excluir</TableHead>
+                  <TableHead>Excluir</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -127,9 +127,7 @@ export function Dashboard_Admin_Users() {
                     <TableCell>{user.email_user}</TableCell>
                     <TableCell>{user.role_user}</TableCell>
                     <TableCell>
-                      <Button className="bg-orange-400 hover:bg-orange-500 mr-2">
-                        <Edit />
-                      </Button>
+                     
                       <Button
                         className="bg-orange-400 hover:bg-orange-500"
                         onClick={() => deleteUser.mutate(user.id_user)}

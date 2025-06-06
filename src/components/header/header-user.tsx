@@ -69,9 +69,9 @@ export function Header_users(){
             <Tooltip>
                 <TooltipTrigger asChild>
             
-                <Link to='/doc_admin'  className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/clies') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
+                <Link to='/users_func/doc_user'  className={` flex h-9 w-9 shrink-0 items-center justify-center   text-muted-foreground transition-colors hover:text-foreground rounded-lg ${isActive('/users_func/doc_user') ?'bg-orange-300 border-orange-500 border-t-[4px]  ':'bg-orange-500'} `} >
             
-            <Archive  className= {`h-5 w-5 transition-all  ${isActive('/clies') ? ` text-black`:''}    `} />
+            <Archive  className= {`h-5 w-5 transition-all  ${isActive('/users_func/doc_user') ? ` text-black`:''}    `} />
             <span className="sr-only">Arquivos</span>
             </Link>
                 </TooltipTrigger>
