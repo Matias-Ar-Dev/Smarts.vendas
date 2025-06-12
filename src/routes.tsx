@@ -27,6 +27,7 @@ import Document_List_User from './pages/app/users/document_user/document_user';
 
 
 
+
 export const router = createBrowserRouter([
   // ROTA PÚBLICA: Login
   {
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/users_func', element: <Dashboard_user /> },
           {path:'/users_func/doc_user', element: <Document_List_User/>},
+          {path:'/users_func/profile_user', element: <EditProfile/>},
         ],
       },
     ],

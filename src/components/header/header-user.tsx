@@ -94,9 +94,9 @@ export function Header_users(){
             <Tooltip>
                 <TooltipTrigger asChild>
             
-                <Link to='/profile-user' className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-full  bg-orange-500 text-muted-foreground transition-colors hover:text-white " >
+                <Link to='/users_func/profile_user' className={` flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${isActive('/users_func/profile_user')?'bg-orange-300':'bg-orange-500'}  text-muted-foreground transition-colors hover:text-white `} >
             
-            <UserCog className="w-5 h-5 "/>
+            <UserCog className={`w-5 h-5  ${isActive('/users_func/profile_user')?'text-black':''}`}/>
             <span className="sr-only">Editar</span>
             </Link>
 
@@ -158,12 +158,21 @@ export function Header_users(){
                                  <span className={` ${isActive('/notfi_users') ? ` text-black`:''} `}>  notificações</span>
                                </Link>
                                 <Link
-                                  to="/clies"
+                                 to='/users_func/doc_user' 
                                   className=" flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground  "
                                 >
-                                  <Archive className= {`h-5 w-5 transition-all ${isActive('/notfi') ? ` text-black`:''}`} />
-                                  <span  className={` ${isActive('/clies') ? ` text-black`:''} `}>
+                                  <Archive className= {`h-5 w-5 transition-all ${isActive('/users_func/doc_user') ? ` text-black`:''}`} />
+                                  <span  className={` ${isActive('/users_func/doc_user') ? ` text-black`:''} `}>
                                   Arquivos
+                                  </span>
+                                </Link>
+                                 <Link
+                                 to='/users_func/profile_user' 
+                                  className=" flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground  "
+                                >
+                                  <UserCog className= {`h-5 w-5 transition-all ${isActive('/users_func/profile_user') ? ` text-black`:''}`} />
+                                  <span  className={` ${isActive('/users_func/profile_user') ? ` text-black`:''} `}>
+                                  Editar
                                   </span>
                                 </Link>
                              

@@ -1,31 +1,58 @@
-import { ChevronLeft, ChevronRight, CircleArrowRight, DownloadCloud } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useUploads } from "@/hooks/uploads";
-import { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  DownloadCloud,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+
+import { useState, useEffect } from "react";
 import { Skeleton } from "../ui/skeleton";
-import { api } from '@/lib/axios'; // import axios configurado
+import { api } from "@/lib/axios";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { usePaginationDocuments } from "@/hooks/usePagitanioDoc";
+import { useFilterDocuments } from "@/hooks/useFilterDoc";
 
 function Doc() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
-  // Hook customizado para carregar uploads
-  const { data, isLoading, isError } = useUploads({ page, limit: 6 });
+  const isSearching = search.trim().length > 0;
+
+  const {
+    data: filteredData,
+    isLoading: isFiltering,
+    isError: isFilterError,
+  } = useFilterDocuments(isSearching, search);
+
+  const {
+    data: paginatedData,
+    isLoading: isPaginating,
+    isError: isPaginateError,
+  } = usePaginationDocuments(page, search);
+
+  const data = isSearching ? filteredData : paginatedData?.data;
+  const isLoading = isSearching ? isFiltering : isPaginating;
+  const isError = isSearching ? isFilterError : isPaginateError;
 
   const handleNextPage = () => {
-    if (data?.lastPage > page) {
-      setPage((prevPage) => prevPage + 1);
+    if (!isSearching && paginatedData?.lastPage > page) {
+      setPage((prev) => prev + 1);
     }
   };
 
   const handlePrevPage = () => {
-    if (page > 1) {
-      setPage((prevPage) => prevPage - 1);
+    if (!isSearching && page > 1) {
+      setPage((prev) => prev - 1);
     }
   };
 
-  // Função para fazer download via Blob (adaptada do seu outro componente)
   const handleDownload = async (id: number, filename: string) => {
     try {
       const response = await api.get(`/documentos/download/${id}`, {
@@ -51,66 +78,45 @@ function Doc() {
     }
   };
 
-  if (isLoading)
-    return (
-      <Card className="flex-1 p-6">
-        <div>
-          <p>carregar...</p>
-          <div className="pt-9">
-            <Skeleton className=" h-4 w-40 mb-3" />
-            <div className="flex gap-4 flex-col">
-              <Skeleton className=" h-12 w-full" />
-              <Skeleton className=" h-10 w-32" />
-              <br />
-              <Skeleton className=" h-10 w-1/2" />
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-
-  if (isError)
-    return (
-      <Card className="flex-1 p-6">
-        <p className="text-red-600">Erro ao Carregar documentos...</p>
-      </Card>
-    );
-
   return (
-    <Card className="w-full md:w-1/2 max-w-600px ">
+    <Card className="w-full md:w-1/2 max-w-600px">
       <CardHeader>
         <div className="flex items-center justify-center">
           <CardTitle className="text-lg sm:text-xl text-gray-800">
             Transferências de Documentos
           </CardTitle>
           <div className="ml-auto w-72">
-            <span className="cursor-pointer">
-              <Input placeholder="pesquisa por documentos..."/>
-            </span>
+            <Input
+              placeholder="Pesquisar por documentos..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1); // reinicia a página ao buscar
+              }}
+            />
           </div>
         </div>
       </CardHeader>
 
       <CardContent>
-       
+        {data?.length === 0 ? (
+          <p className="text-sm text-gray-500">Nenhum documento encontrado.</p>
+        ) : (
+          data?.map((doc: any) => (
+            <article
+              key={doc.id_document}
+              className="flex items-center gap-2 border-b border-orange-600 py-2 justify-between"
+            >
+              <div>
+                <p className="text-sm sm:text-base font-semibold capitalize">
+                  {doc.name_document}
+                </p>
+                <span className="text-[12px] sm:text-sm text-gray-400">
+                  {new Date(doc.data_create).toLocaleDateString()}
+                </span>
+              </div>
 
-        {data?.data.map((doc) => (
-          <article
-            key={doc.id_document}
-            className="flex items-center gap-2 border-b border-orange-600 py-2 justify-between"
-          >
-            <div>
-              <p className="text-sm sm:text-base font-semibold capitalize">
-                {doc.name_document}
-              </p>
-              <span className="text-[12px] sm:text-sm text-gray-400">
-                {new Date(doc.data_create).toLocaleDateString()}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-center gap-6">
-              <div className="flex items-center flex-col justify-center gap-3 mr-9 sm:flex-row">
-                
+              <div className="flex items-center justify-center gap-6">
                 <button
                   onClick={() => handleDownload(doc.id_document, doc.name_document)}
                   className="text-[12px] sm:text-sm text-gray-400 cursor-pointer flex items-center gap-1"
@@ -119,28 +125,29 @@ function Doc() {
                   Baixar
                 </button>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))
+        )}
 
-        {/* Controles de Navegação */}
-        <div className="flex justify-between mt-4">
-          <Button
-            className="px-4 py-2 text-sm bg-orange-600 hover:bg-orange-400  rounded"
-            onClick={handlePrevPage}
-            disabled={page === 1 || isLoading}
-          >
-          <ChevronLeft/>  Anterior 
-          </Button>
+        {!isSearching && (
+          <div className="flex justify-between mt-4">
+            <Button
+              className="px-4 py-2 text-sm bg-orange-600 hover:bg-orange-400 rounded"
+              onClick={handlePrevPage}
+              disabled={page === 1 || isLoading}
+            >
+              <ChevronLeft /> Anterior
+            </Button>
 
-          <Button
-            className="px-4 py-2 text-sm bg-orange-600 hover:bg-orange-400 rounded"
-            onClick={handleNextPage}
-            disabled={page === data?.lastPage || isLoading}
-          >
-            Próxima <ChevronRight/>
-          </Button>
-        </div>
+            <Button
+              className="px-4 py-2 text-sm bg-orange-600 hover:bg-orange-400 rounded"
+              onClick={handleNextPage}
+              disabled={page === paginatedData?.lastPage || isLoading}
+            >
+              Próxima <ChevronRight />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
