@@ -195,28 +195,33 @@ const Document_List_User = () => {
               </div>
 
               <div className="flex flex-col items-center justify-center gap-3 mr-9 sm:flex-row">
-                <Dialog open={editingDoc?.id_document === doc.id_document} onOpenChange={(open) => !open && setEditingDoc(null)}>
-                  <DialogTrigger asChild>
-                    <Button variant='outline'>
-                      <Edit
-                        className="w-4 h-4 text-orange-600 font-bold sm:w-5 sm:h-5 cursor-pointer"
-                        onClick={() => setEditingDoc(doc)}
-                      />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Editar Documento</DialogTitle>
-                    </DialogHeader>
-                    {editingDoc && (
-                      <EditDocumento
-                        document={editingDoc}
-                        onClose={() => setEditingDoc(null)}
-                        onUpdated={() => refetch()}
-                      />
-                    )}
-                  </DialogContent>
-                </Dialog>
+               <Dialog onOpenChange={(open) => {
+  if (!open) setEditingDoc(null);
+}}>
+  <DialogTrigger asChild>
+    <Button
+      variant='outline'
+      onClick={() => setEditingDoc(doc)}
+    >
+      <Edit
+        className="w-4 h-4 text-orange-600 font-bold sm:w-5 sm:h-5 cursor-pointer"
+      />
+    </Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Editar Documento</DialogTitle>
+    </DialogHeader>
+    {editingDoc && (
+      <EditDocumento
+        document={editingDoc}
+        onClose={() => setEditingDoc(null)}
+        onUpdated={() => refetch()}
+      />
+    )}
+  </DialogContent>
+</Dialog>
+
 
                 <Button
                   variant='outline'

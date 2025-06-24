@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Archive, Dock, DockIcon, Plus, UserCheck, Users2Icon } from "lucide-react";
+import { Archive, Plus, UserCheck, Users2Icon } from "lucide-react";
 import { Mobile } from "./menumobile";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -13,11 +13,18 @@ import { EddUser } from "@/components/edduser_list_doc/edd_users";
 import Doc from "@/components/edduser_list_doc/doclist";
 import Users from "@/components/edduser_list_doc/users";
 import { useUserCount } from "@/hooks/total_user";
+import { useDocumentCount } from "@/hooks/total_documentos";
+import { useDocumentsByCategory } from "@/hooks/total_role_documents";
 
 
 
 export function Dashboard_Admin() {
   const{data} = useUserCount()
+  const {data: totalDocs} = useDocumentCount()
+  const {data: totalDocsRole} = useDocumentsByCategory()
+  const totalCliente = totalDocsRole?.find(item => item.categoria === 'cliente')?.total || 0;
+  const totalEmpresa = totalDocsRole?.find(item => item.categoria === 'empresa')?.total || 0;
+
   
 
 
@@ -61,7 +68,10 @@ export function Dashboard_Admin() {
               <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base sm:text-lg font-bold">720</p>
+            <p className="text-base sm:text-lg font-bold">
+  {totalDocs !== undefined ? totalDocs : '...'}
+</p>
+
             </CardContent>
           </Card>
 
@@ -76,7 +86,7 @@ export function Dashboard_Admin() {
               <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base sm:text-lg font-bold">234</p>
+              <p className="text-base sm:text-lg font-bold">{totalEmpresa}</p>
             </CardContent>
           </Card>
 
@@ -95,22 +105,21 @@ export function Dashboard_Admin() {
             </CardContent>
           </Card>
 
-          <Card>
+         <Card>
             <CardHeader>
               <div className="flex items-center justify-center">
                 <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                  Gerar Relatório PDF
+                  Total de Documento dos clientes
                 </CardTitle>
-                <Dock className="ml-auto w-4 h-4" />
+                <Archive className="ml-auto w-4 h-4" />
               </div>
-              <CardDescription>Relatório geral da Empresa</CardDescription>
+              <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="bg-orange-500 hover:bg-orange-400">
-                Criar <DockIcon />
-              </Button>
+              <p className="text-base sm:text-lg font-bold">{totalCliente}</p>
             </CardContent>
           </Card>
+
         </section>
 
         <section className="mt-4 flex flex-col md:flex-row gap-4">

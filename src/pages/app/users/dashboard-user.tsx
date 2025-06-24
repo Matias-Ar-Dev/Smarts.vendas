@@ -15,13 +15,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Mobile_user } from "./menuMobile";
-import { Archive, Dock, DockIcon, FilePlus } from "lucide-react";
+import { Archive, Dock, DockIcon, FilePlus, Users2Icon } from "lucide-react";
 import Doc from "@/components/edduser_list_doc/doclist";
 import UploadForm from "@/components/add_doc/add_doc";
 import { useCreateDocument } from "@/hooks/useCreatedocument";
 import { toast } from "sonner";
+import { useDocumentCount } from "@/hooks/total_documentos";
+import { useDocumentsByCategory } from "@/hooks/total_role_documents";
+import { useUserCount } from "@/hooks/total_user";
 
 export function Dashboard_user() {
+  const {data: totalDocs} = useDocumentCount()
+  const {data: totaluser}= useUserCount()
+  const {data:totalDocsRole} = useDocumentsByCategory()
+  const totalClientes = totalDocsRole?.find(item => item.categoria === 'cliente')?.total||0;
+  const totalInterno = totalDocsRole?.find(item => item.categoria === 'empresa')?.total || 0;
   const { createDocument, loading: creating, error: createError } = useCreateDocument();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -81,7 +89,7 @@ export function Dashboard_user() {
               <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base sm:text-lg font-bold">720</p>
+              <p className="text-base sm:text-lg font-bold">{totalDocs}</p>
             </CardContent>
           </Card>
 
@@ -96,7 +104,7 @@ export function Dashboard_user() {
               <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base sm:text-lg font-bold">234</p>
+              <p className="text-base sm:text-lg font-bold">{totalInterno}</p>
             </CardContent>
           </Card>
 
@@ -104,33 +112,34 @@ export function Dashboard_user() {
             <CardHeader>
               <div className="flex items-center justify-center">
                 <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                  Total de Documento Externo
+                  Total de Documento dos Clientes
                 </CardTitle>
                 <Archive className="ml-auto w-4 h-4" />
               </div>
               <CardDescription>Registado no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base sm:text-lg font-bold">1000</p>
+              <p className="text-base sm:text-lg font-bold">{totalClientes}</p>
             </CardContent>
           </Card>
+          <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-center">
+                          <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
+                            Total de usuários 
+                          </CardTitle>
+                          <Users2Icon className="ml-auto w-4 h-4" />
+                        </div>
+                        <CardDescription>Registado no sistema</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-base sm:text-lg font-bold">{totaluser}</p>
+                      </CardContent>
+                    </Card>
+          
+                   
 
-          <Card >
-            <CardHeader>
-              <div className="flex items-center justify-center">
-                <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                  Gerar Relatório PDF
-                </CardTitle>
-                <Dock className="ml-auto w-4 h-4" />
-              </div>
-              <CardDescription>Relatório geral da Empresa</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="bg-orange-500 hover:bg-orange-400">
-                Criar <DockIcon className="ml-2 w-4 h-4" />
-              </Button>
-            </CardContent>
-          </Card>
+         
         </section>
 
         <section className="mt-4 flex flex-col md:flex-row gap-4">

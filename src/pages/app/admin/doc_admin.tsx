@@ -1,193 +1,267 @@
-import { CardTitle } from "@/components/ui/card";
-import { Mobile } from "./menumobile";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
-import { Archive, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useUploads } from "@/hooks/uploads";
-import CreateUploadForm from "@/components/edduser_list_doc/edd_upload";
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Edit, Trash2, Search } from 'lucide-react';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import UploadForm from '@/components/add_doc/add_doc';
+import { useCreateDocument } from '@/hooks/useCreatedocument';
+import { useDeleteDocument } from '@/hooks/useDeleteDoc';
 
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { api } from '@/lib/axios';
+import { usePaginationDocuments } from '@/hooks/usePagitanioDoc';
+import { useFilterDocuments } from '@/hooks/useFilterDoc';
+import { Mobile } from './menumobile';
+import EditDocumento from '@/components/add_doc/editar_doc';
 
-import { Toaster } from "sonner";
-import { useUpdateUpload } from "@/hooks/updadeUpload";
+type Document = {
+  id_document: number;
+  name_document: string;
+  path_document: string;
+  role_document: string;
+  document_size: string;
+  data_create: string;
+  categoria_document: string;
+};
 
-
-export function Dashboard_admin_doc() {
+export const Dashboard_admin_doc = () => {
   const [page, setPage] = useState(1);
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar a edição
-  const [editData, setEditData] = useState({ id_uploads: 0, original_name: "", mime_type: "" }); // Dados para edição
+  const [editingDoc, setEditingDoc] = useState<Document | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterEnabled, setFilterEnabled] = useState(false);
 
-  const { data, isLoading, isError } = useUploads({ page, limit: 5 });
-  const uploads = data?.data ?? [];
-  const lastPage = data?.lastPage ?? 1;
+  const { createDocument, loading: creating, error: createError } = useCreateDocument();
+  const { mutate: deleteDocument, isPending: deleting } = useDeleteDocument();
 
-  const { mutate: deleteUpload, isLoading: isDeleting } = useDeleteUpload();
-  const { mutate: updateUpload, isLoading: isUpdating } = useUpdateUpload(); // Hook de atualização
+  const { data, isLoading, isError, refetch } = usePaginationDocuments(page);
+  const { data: filteredDocs, isFetching: searching } = useFilterDocuments(filterEnabled, searchTerm);
 
-  const handleNextPage = () => {
-    if (page < lastPage) {
+  const docsToShow = filterEnabled && filteredDocs ? filteredDocs : data?.data || [];
+
+  const handleDelete = (id_document: number) => {
+    deleteDocument(id_document, {
+      onSuccess: () => {
+        toast.success("Documento excluído com sucesso.");
+        refetch();
+      },
+      onError: () => {
+        toast.error("Erro ao excluir documento.");
+      }
+    });
+  };
+
+  const handleDownload = async (id: number, filename: string) => {
+    try {
+      const response = await api.get(`/documentos/download/${id}`, {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const blob = new Blob([response.data], { type: response.headers['content-type'] || 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Download iniciado');
+    } catch (error) {
+      console.error('Erro ao baixar o documento:', error);
+      toast.error('Erro ao baixar o documento');
+    }
+  };
+
+  const formatSize = (sizeInBytes: string) => {
+    const size = parseInt(sizeInBytes, 10);
+    if (isNaN(size)) return sizeInBytes;
+    if (size >= 1024 * 1024) return (size / (1024 * 1024)).toFixed(2) + ' MB';
+    if (size >= 1024) return (size / 1024).toFixed(2) + ' KB';
+    return size + ' bytes';
+  };
+
+  const nextPage = () => {
+    if (data?.lastPage && page < data.lastPage) {
       setPage((prev) => prev + 1);
     }
   };
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage((prev) => prev - 1);
+  const prevPage = () => {
+    setPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      setFilterEnabled(true);
+    } else {
+      setFilterEnabled(false);
     }
   };
 
-  const handleEdit = (doc: any) => {
-    setIsEditing(true);
-    setEditData({ id_uploads: doc.id_uploads, original_name: doc.original_name, mime_type: doc.mime_type });
-  };
-
-  const handleSaveEdit = () => {
-    updateUpload(editData); // Atualiza o upload com os novos dados
-    setIsEditing(false);
-  };
+  if (isLoading) return <p>Carregando...</p>;
+  if (isError) return <p>Erro ao carregar documentos.</p>;
 
   return (
-    <>
-      <Mobile />
-      <section className="sm:ml-14 p-4">
-        
-        <Toaster richColors position="top-right" /> {/* Sonner ativado */}
-        <section className="flex items-start justify-between flex-col lg:flex-row">
+    <section>
+      <Mobile/>
+      <div className="sm:ml-14 p-4">
+        <header className="flex items-start justify-between flex-col lg:flex-row">
           <div className="p-4">
-            <CardTitle className="text-lg sm:text-xl  text-gray-800 select-none">
-              Painel do admin
-            </CardTitle>
+            <h2 className="text-lg sm:text-xl text-gray-800 select-none">
+              Painel de actividades
+            </h2>
             <span className="text-zinc-500">
-              Gestão e controle de todas as atividades na plataforma
+              Gestão e controle de todas as actividades na plataforma
             </span>
           </div>
+
           <div className="flex items-center justify-between gap-4 p-4">
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-orange-500 hover:bg-orange-400">
-                  <Archive />
-                  Adicionar Arquivo
+                <Button className='bg-orange-600 hover:bg-orange-400' disabled={creating}>
+                  {creating ? 'Enviando documento...' : 'Adicionar Documento'}
                 </Button>
               </DialogTrigger>
-              <CreateUploadForm />
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Adicionar Documento</DialogTitle>
+                </DialogHeader>
+                <UploadForm
+                  onSubmit={async (formData) => {
+                    try {
+                      await createDocument(formData);
+                      toast.success('Documento criado com sucesso!');
+                      refetch();
+                    } catch {
+                      toast.error('Erro ao criar documento');
+                    }
+                  }}
+                />
+                {createError && <p className="text-red-600 mt-2">{createError}</p>}
+              </DialogContent>
             </Dialog>
           </div>
-        </section>
+        </header>
 
-        <Table className="text-nowrap border rounded-md">
-          <TableHeader className="bg-orange-200">
-            <TableRow>
-              <TableHead>Nome do Arquivo</TableHead>
-              <TableHead>Extensão do Arquivo</TableHead>
-              <TableHead>Data do Arquivo</TableHead>
-              <TableHead>Editar/Excluir</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell colSpan={4}>Carregando...</TableCell>
-              </TableRow>
-            )}
-            {isError && (
-              <TableRow>
-                <TableCell colSpan={4}>Erro ao carregar dados.</TableCell>
-              </TableRow>
-            )}
-            {uploads.length === 0 && !isLoading && (
-              <TableRow>
-                <TableCell colSpan={4}>Nenhum documento encontrado.</TableCell>
-              </TableRow>
-            )}
-            {uploads.map((doc) => (
-              <TableRow key={doc.id_uploads} className="bg-gray-100">
-                <TableCell className="capitalize">{doc.original_name}</TableCell>
-                <TableCell>{doc.stored_name}</TableCell>
-                <TableCell>
-                  {new Date(doc.upload_date).toLocaleDateString("pt-AO")}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => handleEdit(doc)} // Inicia a edição
-                    className="bg-orange-400 hover:bg-orange-500 mr-2"
-                  >
-                    <Edit />
-                  </Button>
-                  <Button
-                    onClick={() => { deleteUpload(doc.id_uploads); }}
-                    className="bg-orange-400 hover:bg-orange-500"
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? "..." : <Trash2 className="text-red-500 font-bold" />}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {/* Controles de Navegação */}
-        <div className="flex justify-end mt-4">
-          <Button
-            onClick={handlePrevPage}
-            disabled={page === 1 || isLoading}
-            className=" bg-orange-500 hover:bg-orange-300"
-          >
-            <ChevronLeft />
-          </Button>
-          <span className="text-sm text-gray-500 mt-2">
-            Página {page} de {lastPage}
-          </span>
-          <Button
-            onClick={handleNextPage}
-            disabled={page === lastPage || isLoading}
-            className=" bg-orange-500 hover:bg-orange-300"
-          >
-            <ChevronRight />
-          </Button>
-        </div>
-
-        {/* Dialog de Edição */}
-        <Dialog open={isEditing} onOpenChange={setIsEditing}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-500 hover:bg-blue-400">
-              Editar Documento
-            </Button>
-          </DialogTrigger>
-          <div className="p-4">
-            <h2 className="text-lg font-bold">Editar Documento</h2>
-            <input
-              type="text"
-              value={editData.original_name}
-              onChange={(e) => setEditData({ ...editData, original_name: e.target.value })}
-              className="w-full p-2 mt-2 border rounded-md"
-              placeholder="Novo nome do arquivo"
-            />
-            <input
-              type="text"
-              value={editData.mime_type}
-              onChange={(e) => setEditData({ ...editData, mime_type: e.target.value })}
-              className="w-full p-2 mt-2 border rounded-md"
-              placeholder="Novo tipo MIME"
+        <main className="space-y-4">
+          <Card className="flex items-center p-2 gap-2">
+            <Input
+              placeholder="Pesquisar por documentos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <Button
-              onClick={handleSaveEdit} // Salva as alterações
-              className="bg-green-500 hover:bg-green-400 mt-4"
-              disabled={isUpdating}
+              className="bg-orange-600 hover:bg-orange-400"
+              onClick={handleSearch}
+              disabled={searching}
             >
-              {isUpdating ? "Salvando..." : "Salvar Alterações"}
+              <Search className="w-4 h-4 mr-1" />
+              {searching ? 'Buscando...' : 'Pesquisar'}
             </Button>
-          </div>
-        </Dialog>
-      </section>
-    </>
+          </Card>
+
+          {docsToShow.map((doc) => (
+            <article
+              key={doc.id_document}
+              className="flex items-center gap-2 border-b border-orange-500 py-2 justify-between"
+            >
+              <div>
+                <p className="text-sm sm:text-base font-semibold capitalize">{doc.name_document}</p>
+                <span className="text-[12px] sm:text-sm text-gray-400">Papel: {doc.role_document}</span>
+              </div>
+
+              <div>
+                <p className="text-sm sm:text-base font-semibold capitalize">{formatSize(doc.document_size)}</p>
+                <span className="text-[12px] sm:text-sm text-gray-400">
+                  criado em: {new Date(doc.data_create).toLocaleDateString()}
+                </span>
+              </div>
+
+              <div>
+                <button
+                  className="text-orange-600 hover:underline"
+                  onClick={() => handleDownload(doc.id_document, doc.name_document)}
+                >
+                  Download
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-3 mr-9 sm:flex-row">
+             <Dialog onOpenChange={(open) => {
+  if (!open) setEditingDoc(null);
+}}>
+  <DialogTrigger asChild>
+    <Button
+      variant='outline'
+      onClick={() => setEditingDoc(doc)}
+    >
+      <Edit
+        className="w-4 h-4 text-orange-600 font-bold sm:w-5 sm:h-5 cursor-pointer"
+      />
+    </Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Editar Documento</DialogTitle>
+    </DialogHeader>
+    {editingDoc && (
+      <EditDocumento
+        document={editingDoc}
+        onClose={() => setEditingDoc(null)}
+        onUpdated={() => refetch()}
+      />
+    )}
+  </DialogContent>
+</Dialog>
+
+                <Button
+                  variant='outline'
+                  onClick={() => handleDelete(doc.id_document)}
+                  title="Apagar Documento"
+                  className="text-red-600 hover:text-red-800"
+                  disabled={deleting}
+                >
+                  {deleting ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    <Trash2 className="w-5 h-5" />
+                  )}
+                </Button>
+              </div>
+            </article>
+          ))}
+        </main>
+
+        {!filterEnabled && (
+          <footer className="flex justify-between items-center mt-6">
+            <Button
+              onClick={prevPage}
+              disabled={page === 1}
+              className="px-4 py-2 bg-orange-600 hover:bg-orange-400 text-white rounded disabled:bg-gray-300"
+            >
+              <ChevronLeft /> Anterior
+            </Button>
+
+            <span className="text-sm">
+              Página {page} de {data?.lastPage ?? '...'}
+            </span>
+
+            <Button
+              onClick={nextPage}
+              disabled={!data?.lastPage || page === data.lastPage}
+              className="px-4 py-2 bg-orange-600 hover:bg-orange-400 text-white rounded disabled:bg-gray-300"
+            >
+              Próxima <ChevronRight />
+            </Button>
+          </footer>
+        )}
+      </div>
+    </section>
   );
-}
+};
