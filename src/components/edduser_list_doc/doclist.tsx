@@ -12,7 +12,6 @@ import {
 } from "../ui/card";
 
 import { useState, useEffect } from "react";
-import { Skeleton } from "../ui/skeleton";
 import { api } from "@/lib/axios";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";

@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
-import axios from 'axios'
+import { api } from '@/lib/axios'
 
 const CreateUploadForm: React.FC = () => {
   const [files, setFiles] = useState<FileList | null>(null)
@@ -29,7 +29,7 @@ const CreateUploadForm: React.FC = () => {
     setMessage('Enviando arquivos...')
 
     try {
-      const response = await axios.post('http://localhost:3000/upload', formData, {
+      const response = await api.post('/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

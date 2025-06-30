@@ -1,5 +1,5 @@
 import { api } from '@/lib/axios';
-import axios from 'axios';
+
 
 interface EditProfileData {
   name_user: string;
