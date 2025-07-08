@@ -14,8 +14,15 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { Terminar_se } from "../edduser_list_doc/terminar_s";
+import { useEffect, useState } from "react";
 export function Header_Admin (){
   const location = useLocation();
+  const [userName, setUserName] = useState <String | null> (null)
+  const [userEmail, setUserEmail]= useState <String | null> (null)
+  useEffect(()=>{
+    setUserName(localStorage.getItem("name"))
+    setUserEmail(localStorage.getItem("email"))
+  },[]);
 
   const isActive = (path: string): boolean => location.pathname === path;
    
@@ -196,7 +203,19 @@ export function Header_Admin (){
               </Sheet>
               <h2>Menu</h2>
 
-              users test
+              {
+                userName && userEmail ?(
+
+                  <div className="text-right p-2 ml-auto">
+                       <p className=" capitalize ">olá, {userName}</p>
+                        <small className="text-gray-300">{userEmail}</small>
+
+                  </div>
+                ):(
+
+                  <p>Usuário não logado</p>
+                )
+              }
             </header>
           </div>
 
