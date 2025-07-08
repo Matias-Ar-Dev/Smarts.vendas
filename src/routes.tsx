@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
     path: '/sign-in',
     element: <AuthLayoutUser />,
     children: [
-      { path: '/sign-in', element: <Sign_in /> },
+      { path: '', element: <Sign_in /> },
     ],
   },
   // ROTAS PROTEGIDAS
