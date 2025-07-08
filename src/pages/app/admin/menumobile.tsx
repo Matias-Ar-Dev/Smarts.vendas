@@ -22,7 +22,7 @@ return (<>
 
 <div className="flex items-center gap-2">
 <h1 className="font-bold text-sm md:text-xl tracking-tight whitespace-nowrap">
-smart.vendas
+smarts.vendas
 </h1>
 </div>
 
